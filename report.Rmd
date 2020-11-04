@@ -1,0 +1,47 @@
+---
+title: "Estimating the border area or the gray area on the image"
+author: "Fereidoun Mianji"
+date: "11/4/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1. Introduction
+
+in edge detection, clustering, or classification tasks the hardest pixels or element to discriminate are border areas. This code detects such objct, here pixels on the image of handwritten digits, and estimated the total area occupied by them on every image. Dataset mnist consisting of 60,000 samples is used in this project.
+
+2. Data preparation
+
+The dataset can be downloaded for the first run using the following scripts.
+
+```{r loading the dataset, message=FALSE}
+library(dslabs)
+mnist <- read_mnist()
+```
+
+Then, we assign shorter names to the images and their lables (digits). We also need to define our gray level meaning. Here it is set to 50 to 205.
+
+```{r prepare the data, message=FALSE}
+library(tidyverse)
+
+x <- mnist$train$images
+y <- mnist$train$labels  
+gray_pix <- (50 < x & x < 205) 
+```
+
+3. Gray area distribution
+
+We are interested to compare the range of gray areas over digits 0 to 9 in our data, and the median value for each. Therefor using the fllowing code we present box plots of all digits in a single plot. 
+
+```{r plot thedistributions ofgray scale for all digits, message=FALSE}
+tibble(labels = as.factor(y), gray_rate = rowMeans(gray_pix)) %>%
+  qplot(labels, gray_rate, data = ., geom = "boxplot") +
+  xlab('Digits (lables)') +
+  ylab('Gray area rate (of the image)') +
+  ggsave('fig/digits_gray_area.png')
+```
+
+It can be seen that 1 and 7 have the smallest gray areas. This is predictable as they are shortest lines among the digits. 
